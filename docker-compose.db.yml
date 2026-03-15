@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: blog_postgres_local
+    environment:
+      POSTGRES_USER: blog_user
+      POSTGRES_PASSWORD: blog_password
+      POSTGRES_DB: blog_db
+    ports:
+      - "5432:5432"  # Пробрасываем порт на локальную машину
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    command: postgres -c listen_addresses='*'  # Разрешаем внешние подключения
+
+volumes:
+  postgres_data:

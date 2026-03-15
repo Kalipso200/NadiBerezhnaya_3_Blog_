@@ -1,0 +1,38 @@
+# Core
+fastapi==0.115.11
+uvicorn[standard]==0.34.0
+sqlalchemy==2.0.40
+psycopg2-binary==2.9.10
+alembic==1.15.2
+
+# Auth
+python-jose[cryptography]==3.4.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.3.0
+python-multipart==0.0.20
+
+# Pydantic
+pydantic[email]==2.11.3
+pydantic-settings==2.8.1
+python-dotenv==1.1.0
+
+# Data Science - обновленные версии для Python 3.13
+numpy==2.2.4
+pandas==2.2.3
+matplotlib==3.10.1
+seaborn==0.13.2
+
+# Testing
+pytest==8.3.5
+pytest-asyncio==0.25.3
+pytest-cov==6.1.1
+httpx==0.28.1
+
+# Optional - для разработки
+black==25.1.0
+isort==6.0.1
+
+pytest==8.3.5
+pytest-asyncio==0.25.3
+pytest-cov==6.1.1
+httpx==0.28.1

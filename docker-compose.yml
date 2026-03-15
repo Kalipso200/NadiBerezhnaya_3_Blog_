@@ -1,0 +1,58 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: blog_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-blog_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-blog_password}
+      POSTGRES_DB: ${POSTGRES_DB:-blog_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-blog_user} -d ${POSTGRES_DB:-blog_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - blog_network
+
+  app:
+    build: .
+    container_name: blog_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      SECRET_KEY: ${SECRET_KEY}
+      ALGORITHM: ${ALGORITHM:-HS256}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      DEBUG: ${DEBUG:-True}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+      - ./alembic:/alembic
+      - ./alembic.ini:/alembic.ini
+    command: >
+      sh -c "
+        echo 'Waiting for PostgreSQL...' &&
+        while ! nc -z postgres 5432; do
+          sleep 1
+        done &&
+        echo 'PostgreSQL is ready!' &&
+        alembic upgrade head &&
+        uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    networks:
+      - blog_network
+
+volumes:
+  postgres_data:
+
+networks:
+  blog_network:
+    driver: bridge
